@@ -1,0 +1,443 @@
+/* PROTOTYPE styles — criar casamento. Not production design system. */
+
+.proto-switcher {
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  background: #111;
+  color: #f5f5f5;
+  font: 600 13px/1.2 ui-monospace, Consolas, monospace;
+  border: 2px solid #fff;
+}
+
+.proto-switcher button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem 0.4rem;
+}
+
+.proto-state-panel {
+  position: fixed;
+  right: 0.75rem;
+  bottom: 4.5rem;
+  max-width: min(360px, 92vw);
+  max-height: 40vh;
+  overflow: auto;
+  padding: 0.75rem;
+  background: #111;
+  color: #d4d4d4;
+  font: 12px/1.4 ui-monospace, Consolas, monospace;
+  border-radius: 8px;
+  z-index: 9998;
+}
+
+.proto-state-panel pre {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.proto-criar-root {
+  min-height: 100vh;
+}
+
+.proto-criar-root label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.proto-criar-root input,
+.proto-criar-root textarea,
+.proto-criar-root select {
+  font: inherit;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+.proto-criar-root button[type='submit'],
+.va-submit,
+.vb-main button[type='submit'],
+.vc-form-pane button[type='submit'] {
+  cursor: pointer;
+  padding: 0.75rem 1.1rem;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+}
+
+/* —— Variant A: ink + soft sage (ceremony scroll) —— */
+.va-page {
+  --ink: #1c241c;
+  --sage: #3d5c45;
+  --paper: #eef2ea;
+  --mist: #d5e0d4;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  padding: 3rem 1.25rem 7rem;
+}
+
+.va-hero {
+  max-width: 34rem;
+  margin: 0 auto 2.5rem;
+}
+
+.va-brand {
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin: 0 0 1rem;
+}
+
+.va-hero h1 {
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+}
+
+.va-lead {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 1rem;
+  color: #445044;
+}
+
+.va-form {
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.va-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: -0.5rem 0 1.25rem;
+}
+
+.va-chip {
+  text-align: left;
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.65rem;
+  background: transparent;
+  border: 1px solid var(--sage);
+  color: var(--sage);
+  cursor: pointer;
+}
+
+.va-submit {
+  background: var(--sage);
+  color: #f7faf6;
+  width: 100%;
+}
+
+.va-done {
+  max-width: 34rem;
+  margin: 2.5rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--mist);
+  font-family: system-ui, sans-serif;
+}
+
+.va-done code {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: #fff;
+  word-break: break-all;
+}
+
+.va-done button {
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* —— Variant B: charcoal rail + warm paper steps —— */
+.vb-page {
+  --charcoal: #1e2430;
+  --warm: #e8eef4;
+  --clay: #2f5d8c;
+  display: grid;
+  grid-template-columns: minmax(10rem, 15rem) 1fr;
+  min-height: 100vh;
+  background: var(--warm);
+  color: var(--charcoal);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.vb-rail {
+  background: var(--charcoal);
+  color: #f3ebe3;
+  padding: 2rem 1.25rem;
+}
+
+.vb-brand {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0 0 2rem;
+  opacity: 0.7;
+}
+
+.vb-rail ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.vb-rail li {
+  opacity: 0.45;
+  font-size: 0.95rem;
+}
+
+.vb-rail li[data-active='true'] {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.vb-main {
+  padding: 2.5rem 1.5rem 7rem;
+  max-width: 32rem;
+}
+
+.vb-main h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.35rem;
+}
+
+.vb-lead {
+  margin: 0 0 1.5rem;
+  color: #5c534c;
+}
+
+.vb-main button[type='submit'] {
+  background: var(--clay);
+  color: #fff;
+}
+
+.vb-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.vb-ghost {
+  background: transparent;
+  border: 1px solid var(--charcoal);
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.vb-done .vb-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.vb-done code {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.65rem;
+  background: #fff;
+  word-break: break-all;
+}
+
+.vb-done button {
+  background: var(--charcoal);
+  color: #fff;
+  border: 0;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+@media (max-width: 720px) {
+  .vb-page {
+    grid-template-columns: 1fr;
+  }
+
+  .vb-rail ol {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* —— Variant C: split form + live preview (deep teal / sand) —— */
+.vc-page {
+  --teal: #0f3d3e;
+  --sand: #f3ebe0;
+  --ink: #14201f;
+  display: grid;
+  grid-template-columns: minmax(18rem, 26rem) 1fr;
+  min-height: 100vh;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+
+.vc-form-pane {
+  background: var(--sand);
+  padding: 2rem 1.5rem 7rem;
+}
+
+.vc-brand {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+.vc-form-pane h1 {
+  margin: 0 0 1.25rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+}
+
+.vc-form-pane button[type='submit'] {
+  background: var(--teal);
+  color: #f5faf9;
+  width: 100%;
+}
+
+.vc-linkish {
+  background: none;
+  border: 0;
+  color: var(--teal);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  margin: -0.5rem 0 1rem;
+  padding: 0;
+}
+
+.vc-done {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vc-done code {
+  padding: 0.6rem;
+  background: #fff;
+  word-break: break-all;
+  font-size: 0.8rem;
+}
+
+.vc-done button {
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.vc-preview-pane {
+  background: #0f3d3e;
+  color: #f4f1ea;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem 7rem;
+}
+
+.vc-preview-label {
+  align-self: flex-start;
+  margin: 0 0 1.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.vc-welcome {
+  width: min(22rem, 100%);
+  text-align: center;
+}
+
+.vc-welcome h2 {
+  font-weight: 400;
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+  letter-spacing: 0.04em;
+}
+
+.vc-names {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.vc-date {
+  margin: 0 0 1rem;
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+
+.vc-desc {
+  margin: 0 0 1.5rem;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.vc-fake-field {
+  text-align: left;
+  color: #f4f1ea;
+}
+
+.vc-fake-field input {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #f4f1ea;
+}
+
+.vc-fake-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  color: #f4f1ea;
+  font: inherit;
+  opacity: 0.85;
+}
+
+@media (max-width: 840px) {
+  .vc-page {
+    grid-template-columns: 1fr;
+  }
+
+  .vc-preview-pane {
+    min-height: 50vh;
+  }
+}

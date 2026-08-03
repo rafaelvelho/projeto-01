@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prototype:criar-casamento": "vite --open http://localhost:5173/?prototype=criar-casamento&variant=A",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
