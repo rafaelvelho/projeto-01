@@ -1,0 +1,24 @@
+/* Paleta teste: Clássico & Atemporal */
+:root {
+  --classic-white: #ffffff;
+  --classic-cream: #faf7f2;
+  --classic-beige: #efe6d9;
+  --classic-nude: #e4d5c3;
+  --classic-champagne: #c4a574;
+  --classic-champagne-deep: #a68554;
+  --classic-ink: #2c2620;
+  --classic-muted: #6f675e;
+  --classic-serif: 'Cormorant Garamond', 'Palatino Linotype', Palatino, Georgia, serif;
+  --classic-sans: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Keep classic palette even when OS is in dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: var(--classic-muted);
+    --text-h: var(--classic-ink);
+    --bg: var(--classic-cream);
+    --border: var(--classic-nude);
+    --code-bg: var(--classic-beige);
+  }
+}
