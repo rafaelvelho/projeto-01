@@ -182,3 +182,17 @@
     border-right-color: var(--border);
   }
 }
+
+.supabase-status {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-secondary, #888);
+}
+
+.supabase-status[data-status='connected'] {
+  color: #3ecf8e;
+}
+
+.supabase-status[data-status='error'] {
+  color: #f56565;
+}
