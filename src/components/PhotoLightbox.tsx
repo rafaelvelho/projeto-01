@@ -165,7 +165,7 @@ export function PhotoLightbox({
 
         <img
           src={foto.url}
-          alt=""
+          alt={titulo ? `Foto de ${titulo}` : 'Foto do álbum'}
           className="cc-lightbox-img"
           draggable={false}
         />
