@@ -206,10 +206,6 @@ body {
   text-align: center;
 }
 
-.home-classic-inner {
-  max-width: 34rem;
-}
-
 .home-classic .home-brand {
   margin: 0 0 0.85rem;
   letter-spacing: 0.2em;
@@ -240,4 +236,93 @@ body {
   flex-direction: column;
   gap: 0.9rem;
   align-items: center;
+}
+
+/* Teste: foto full-bleed na home */
+.classic-atmosphere.home-classic--photo {
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.28),
+      rgba(0, 0, 0, 0.28)
+    ),
+    url('/images/home-hero.jpg') center / cover no-repeat;
+}
+
+.home-classic--photo::before,
+.home-classic--photo::after {
+  opacity: 0.05;
+}
+
+.home-classic--photo .home-classic-inner {
+  max-width: 36rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(250, 247, 242, 0.06);
+  box-shadow: none;
+  border: 0;
+  border-radius: 0;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  mask-image: radial-gradient(
+    ellipse 98% 95% at 50% 50%,
+    #000 40%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 98% 95% at 50% 50%,
+    #000 40%,
+    transparent 100%
+  );
+}
+
+.home-classic--photo .home-brand {
+  color: #fffaf3;
+  font-weight: 600;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+.home-classic--photo .classic-ornament {
+  color: #d7c19a;
+  width: min(16rem, 75%);
+}
+
+.home-classic--photo .classic-ornament span {
+  font-size: 0.9rem;
+  color: #d7c19a;
+  opacity: 0.95;
+}
+
+.home-classic--photo .classic-ornament::before,
+.home-classic--photo .classic-ornament::after {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(215, 193, 154, 0.55),
+    transparent
+  );
+}
+
+.home-classic--photo h1 {
+  color: #fffaf3 !important;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 2px 14px rgba(0, 0, 0, 0.28);
+}
+
+.home-classic--photo .home-lead {
+  color: rgba(255, 250, 243, 0.96);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.home-classic--photo .classic-link {
+  color: #d7c19a;
+  font-weight: 500;
+  text-decoration-color: rgba(215, 193, 154, 0.45);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.home-classic--photo .classic-cta {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
 }

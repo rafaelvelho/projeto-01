@@ -6,8 +6,7 @@ export function HomePage() {
   const { user, loading } = useAuth()
 
   return (
-    <section className="classic-atmosphere home-classic">
-      <div className="home-classic-glow" aria-hidden />
+    <section className="classic-atmosphere home-classic home-classic--photo">
       <div className="home-classic-inner">
         <p className="home-brand classic-rise">Álbum coletivo</p>
         <div className="classic-ornament classic-rise" aria-hidden>
@@ -15,8 +14,8 @@ export function HomePage() {
         </div>
         <h1 className="classic-rise-delay">O álbum do nosso casamento</h1>
         <p className="home-lead classic-rise-delay">
-          Monte o álbum, compartilhe o link com os convidados e, quando quiser,
-          publique a versão só de visualização.
+          Junte as memórias com seus convidados e, quando tudo estiver pronto,
+          publique a galeria final.
         </p>
 
         {!loading && user ? (

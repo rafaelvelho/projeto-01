@@ -83,6 +83,35 @@ export async function albumUpload(file: File, token: string) {
   return parseJson(res) as Promise<{ foto: FotoItem }>
 }
 
+/** Baixa a foto via Edge Function (CORS ok) para Web Share. */
+export async function albumShareFile(
+  fotoId: string,
+  token?: string | null,
+): Promise<File> {
+  const res = await fetch(baseUrl(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: anonKey(),
+      Authorization: `Bearer ${anonKey()}`,
+      ...(token ? { 'x-album-token': token } : {}),
+    },
+    body: JSON.stringify({ action: 'share_foto', fotoId }),
+  })
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { error?: string }
+    throw new Error(body.error || `Erro ${res.status}`)
+  }
+  const blob = await res.blob()
+  const type = blob.type || 'image/jpeg'
+  const ext = type.includes('png') ? 'png' : 'jpg'
+  return new File([blob], `foto-album.${ext}`, { type })
+}
+
+export function podeCompartilharNativo() {
+  return typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+}
+
 export function sessionKey(slugPrivado: string) {
   return `album-session:${slugPrivado}`
 }

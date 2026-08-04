@@ -13,6 +13,7 @@ import {
   type Papel,
 } from '../lib/album-api'
 import { downloadAlbumZip } from '../lib/download-album'
+import { PhotoLightbox } from '../components/PhotoLightbox'
 import '../prototype/album-privado/album-privado.css'
 
 export function AlbumPrivadoPage() {
@@ -32,6 +33,7 @@ export function AlbumPrivadoPage() {
   const [linkPublicoCopiado, setLinkPublicoCopiado] = useState(false)
   const [busy, setBusy] = useState(false)
   const [baixando, setBaixando] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const unlocked = Boolean(token && casamento)
   const modoNoivos = papel === 'noivos'
@@ -426,17 +428,34 @@ export function AlbumPrivadoPage() {
           </div>
         ) : (
           <div className="cc-masonry">
-            {fotos.map((p) => (
-              <figure key={p.id}>
+            {fotos.map((p, i) => (
+              <figure key={p.id} onClick={() => setLightboxIndex(i)}>
                 <img src={p.url} alt="" />
                 {modoNoivos && (
-                  <button type="button" onClick={() => void apagar(p.id)}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void apagar(p.id)
+                    }}
+                  >
                     Apagar
                   </button>
                 )}
               </figure>
             ))}
           </div>
+        )}
+
+        {lightboxIndex !== null && (
+          <PhotoLightbox
+            fotos={fotos}
+            index={lightboxIndex}
+            titulo={casamento.nome}
+            albumToken={token}
+            onClose={() => setLightboxIndex(null)}
+            onIndexChange={setLightboxIndex}
+          />
         )}
 
         <div className="cc-actions-bar">

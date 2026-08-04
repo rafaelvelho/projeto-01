@@ -7,6 +7,7 @@ import {
   type FotoItem,
 } from '../lib/album-api'
 import { downloadAlbumZip } from '../lib/download-album'
+import { PhotoLightbox } from '../components/PhotoLightbox'
 import '../prototype/album-privado/album-privado.css'
 
 export function AlbumPublicoPage() {
@@ -16,6 +17,7 @@ export function AlbumPublicoPage() {
   const [fotos, setFotos] = useState<FotoItem[]>([])
   const [baixando, setBaixando] = useState(false)
   const [erro, setErro] = useState('')
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -98,12 +100,22 @@ export function AlbumPublicoPage() {
           </div>
         ) : (
           <div className="cc-masonry">
-            {fotos.map((p) => (
-              <figure key={p.id}>
+            {fotos.map((p, i) => (
+              <figure key={p.id} onClick={() => setLightboxIndex(i)}>
                 <img src={p.url} alt="" />
               </figure>
             ))}
           </div>
+        )}
+
+        {lightboxIndex !== null && (
+          <PhotoLightbox
+            fotos={fotos}
+            index={lightboxIndex}
+            titulo={casamento.nome}
+            onClose={() => setLightboxIndex(null)}
+            onIndexChange={setLightboxIndex}
+          />
         )}
 
         <div className="cc-actions-bar">

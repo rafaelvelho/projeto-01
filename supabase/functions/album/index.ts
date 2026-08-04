@@ -476,6 +476,45 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "share_foto") {
+      const fotoId = String(payload.fotoId ?? "");
+      if (!fotoId) return json({ error: "Foto não informada." }, 400);
+      const { data: foto, error } = await supabase
+        .from("fotos")
+        .select("id, storage_path, casamento_id")
+        .eq("id", fotoId)
+        .maybeSingle();
+      if (error || !foto) return json({ error: "Foto não encontrada." }, 404);
+
+      const session = await requireSession(supabase, tokenHeader);
+      if (session && session.casamento_id === foto.casamento_id) {
+        // ok — sessão do álbum privado
+      } else {
+        const { data: casamento, error: cErr } = await supabase
+          .from("casamentos")
+          .select("id, publicado")
+          .eq("id", foto.casamento_id)
+          .maybeSingle();
+        if (cErr || !casamento?.publicado) {
+          return json({ error: "Sem permissão para compartilhar esta foto." }, 403);
+        }
+      }
+
+      const down = await supabase.storage.from(BUCKET).download(foto.storage_path);
+      if (down.error || !down.data) {
+        return json({ error: down.error?.message ?? "Falha ao ler a foto" }, 500);
+      }
+      const contentType = down.data.type || "image/jpeg";
+      return new Response(down.data, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": contentType,
+          "Cache-Control": "private, max-age=60",
+        },
+      });
+    }
+
     if (action === "delete_foto") {
       const session = await requireSession(supabase, tokenHeader);
       if (!session || session.papel !== "noivos") {
