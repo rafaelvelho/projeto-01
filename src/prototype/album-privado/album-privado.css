@@ -630,9 +630,14 @@
   mix-blend-mode: multiply;
 }
 
-.cc-app > *:not(.aa-modal):not(.cc-actions-bar):not(.cc-lightbox) {
+.cc-app > *:not(.aa-modal):not(.cc-actions-bar):not(.cc-lightbox):not(.cc-bar) {
   position: relative;
   z-index: 1;
+}
+
+.cc-app > .cc-bar {
+  position: relative;
+  z-index: 35;
 }
 
 .cc-app > .aa-modal {
@@ -743,15 +748,25 @@
   position: absolute;
   top: calc(100% + 0.45rem);
   right: 0.25rem;
-  z-index: 20;
+  z-index: 40;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   width: min(22rem, calc(100vw - 1.5rem));
+  max-height: min(70vh, 28rem);
+  overflow: auto;
   padding: 0.65rem;
   background: var(--classic-white);
   border: 1px solid var(--classic-nude);
-  box-shadow: 0 10px 28px rgba(44, 38, 32, 0.12);
+  box-shadow: 0 12px 32px rgba(44, 38, 32, 0.18);
+}
+
+@media (max-width: 720px) {
+  .cc-admin-dock {
+    right: 0;
+    left: auto;
+    width: min(20rem, calc(100vw - 1.25rem));
+  }
 }
 
 .cc-admin-dock button {
