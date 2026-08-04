@@ -82,14 +82,14 @@ export function PainelPage() {
               <div className="painel-metrica">
                 <p className="painel-metrica-valor">{resumo!.fotosCount}</p>
                 <p className="painel-metrica-label">
-                  {resumo!.fotosCount === 1 ? 'foto' : 'fotos'}
+                  {resumo!.fotosCount === 1 ? 'foto no álbum' : 'fotos no álbum'}
                 </p>
               </div>
               <div className="painel-metrica">
                 <p className="painel-metrica-valor">
                   {formatBytes(resumo!.bytesTotal)}
                 </p>
-                <p className="painel-metrica-label">no álbum</p>
+                <p className="painel-metrica-label">espaço usado</p>
               </div>
             </div>
 
@@ -98,8 +98,13 @@ export function PainelPage() {
                 Abrir álbum privado
               </a>
               {c.publicado ? (
-                <a href={linkPublico(c.slugPublico)} target="_blank" rel="noreferrer">
-                  Ver álbum público
+                <a
+                  className="painel-cta"
+                  href={linkPublico(c.slugPublico)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Abrir álbum público
                 </a>
               ) : (
                 <span className="painel-muted">

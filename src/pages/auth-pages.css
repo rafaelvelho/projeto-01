@@ -246,8 +246,12 @@
 
 .painel-acoes-principais {
   margin-bottom: 0.5rem;
+  align-items: stretch;
 }
 
 .painel-acoes-principais .painel-cta {
   display: inline-block;
+  color: var(--classic-white) !important;
+  text-decoration: none;
+  font-weight: 700;
 }

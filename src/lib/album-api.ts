@@ -168,14 +168,14 @@ export async function pathDoMeuAlbum(accessToken: string): Promise<string> {
 }
 
 export function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 MB'
   const gb = bytes / 1024 ** 3
   if (gb >= 1) {
     const n = gb >= 10 ? gb.toFixed(0) : gb.toFixed(2)
     return `${n.replace('.', ',')} GB`
   }
   const mb = bytes / 1024 ** 2
-  if (mb >= 1) {
+  if (mb >= 0.1) {
     const n = mb >= 10 ? mb.toFixed(0) : mb.toFixed(1)
     return `${n.replace('.', ',')} MB`
   }
