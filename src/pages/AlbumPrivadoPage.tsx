@@ -285,6 +285,9 @@ export function AlbumPrivadoPage() {
         <div className="cc-welcome">
           <div className="cc-welcome-card">
             <p className="cc-eyebrow">Bem-vindo ao nosso casamento</p>
+            <div className="classic-ornament" aria-hidden>
+              <span>✦</span>
+            </div>
             <h1 className="cc-names">{casamento.nome}</h1>
             <p className="cc-meta">{formatDataCasamento(casamento.data)}</p>
             <p className="cc-desc">{casamento.descricaoRomantica}</p>

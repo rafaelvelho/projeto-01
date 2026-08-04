@@ -149,6 +149,9 @@ export function CriarCasamentoPage() {
       <div className="vc-page">
         <section className="vc-form-pane">
           <p className="vc-brand">Álbum coletivo</p>
+          <div className="classic-ornament" aria-hidden style={{ marginLeft: 0, justifyContent: 'flex-start', width: 'min(12rem, 70%)' }}>
+            <span>✦</span>
+          </div>
           <h1>Montar o álbum</h1>
           <p style={{ color: 'var(--classic-muted)', marginTop: '-0.5rem' }}>
             {user?.email} ·{' '}

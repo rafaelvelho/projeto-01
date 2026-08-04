@@ -43,9 +43,12 @@ export function AuthPage() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
+    <div className="auth-page classic-atmosphere">
+      <div className="auth-card classic-panel classic-rise">
         <p className="auth-brand">Álbum coletivo</p>
+        <div className="classic-ornament" aria-hidden>
+          <span>✦</span>
+        </div>
         <h1>{mode === 'entrar' ? 'Entrar' : 'Criar conta'}</h1>
         <p className="auth-lead">
           Uma conta para o álbum do casamento. Convidados usam só o link e a

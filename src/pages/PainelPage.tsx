@@ -51,11 +51,14 @@ export function PainelPage() {
   const c = resumo?.casamento
 
   return (
-    <div className="auth-page painel-page">
-      <div className="painel-wrap">
+    <div className="auth-page painel-page classic-atmosphere">
+      <div className="painel-wrap classic-panel classic-rise">
         <header className="painel-header">
           <div>
             <p className="auth-brand">Álbum coletivo</p>
+            <div className="classic-ornament" aria-hidden style={{ marginLeft: 0, justifyContent: 'flex-start', width: 'min(12rem, 60%)' }}>
+              <span>✦</span>
+            </div>
             <h1>Nosso álbum</h1>
             <p className="auth-lead">{user?.email}</p>
           </div>
