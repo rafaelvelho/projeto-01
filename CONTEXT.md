@@ -9,11 +9,19 @@ O evento único para o qual este álbum existe (nesta primeira versão, só exis
 _Avoid_: Evento, wedding (no glossário em português), projeto
 
 **Noivos**:
-Quem cria o casamento (nome, data, senha do casamento, código dos noivos, descrição) e compartilha o link de acesso.
+Quem cria o casamento (nome, data, senha do casamento, código dos noivos, descrição) e compartilha o link de acesso. Passam a ter **Conta dos noivos** para montar e reabrir o álbum do casamento.
 _Avoid_: Dono, organizador, casal (quando se refere ao papel no sistema), admin (como nome de pessoa)
 
+**Conta dos noivos**:
+Login com e-mail e senha (Supabase Auth) só para quem cria o álbum. Não é conta de convidado. Uma conta tem no máximo um casamento/álbum.
+_Avoid_: Conta de usuário genérica, login social (nesta fatia)
+
+**Painel**:
+Tela autenticada do álbum único da Conta dos noivos: quantas fotos há, quanto espaço ocupa, status (publicado/congelado) e atalho para o link privado/público. Se ainda não houver álbum, redireciona para criar.
+_Avoid_: Dashboard genérico, backoffice, lista de casamentos, admin panel (como termo canônico)
+
 **Convidado**:
-Quem entra com a senha do casamento no link privado e, enquanto não estiver congelado, pode enviar fotos e ver o álbum — sem o código dos noivos.
+Quem entra com a senha do casamento no link privado e, enquanto não estiver congelado, pode enviar fotos e ver o álbum — sem o código dos noivos e sem Conta dos noivos.
 _Avoid_: Usuário, user, guest (no glossário em português)
 
 **Link privado**:

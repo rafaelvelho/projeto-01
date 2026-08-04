@@ -27,6 +27,21 @@ function adminClient() {
   return createClient(url, key);
 }
 
+async function requireOwner(req: Request) {
+  const auth = req.headers.get("Authorization") ?? "";
+  const jwt = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  const anon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+  if (!jwt || !anon || jwt === anon) return null;
+  const url = Deno.env.get("SUPABASE_URL");
+  if (!url) return null;
+  const client = createClient(url, anon, {
+    global: { headers: { Authorization: `Bearer ${jwt}` } },
+  });
+  const { data, error } = await client.auth.getUser();
+  if (error || !data.user) return null;
+  return data.user;
+}
+
 async function hashSecret(secret: string, salt: string): Promise<string> {
   const data = new TextEncoder().encode(`${salt}:${secret}`);
   const digest = await crypto.subtle.digest("SHA-256", data);
@@ -185,6 +200,27 @@ Deno.serve(async (req) => {
     const supabase = adminClient();
 
     if (action === "create") {
+      const owner = await requireOwner(req);
+      if (!owner) {
+        return json(
+          { error: "Entre na sua conta de noivos para criar um casamento." },
+          401,
+        );
+      }
+      const { count: existentes, error: countErr } = await supabase
+        .from("casamentos")
+        .select("id", { count: "exact", head: true })
+        .eq("owner_id", owner.id);
+      if (countErr) return json({ error: countErr.message }, 500);
+      if ((existentes ?? 0) > 0) {
+        return json(
+          {
+            error:
+              "Esta conta já tem um álbum. Entre de novo para abrir o existente.",
+          },
+          409,
+        );
+      }
       const nome = String(payload.nome ?? "").trim();
       const data = String(payload.data ?? "").trim();
       const descricaoRomantica = String(payload.descricaoRomantica ?? "").trim();
@@ -210,6 +246,7 @@ Deno.serve(async (req) => {
           codigo_noivos_hash: codigoHash,
           slug_privado: slugPrivado,
           slug_publico: slugPublico,
+          owner_id: owner.id,
         })
         .select(
           "id, nome, data, descricao_romantica, slug_privado, slug_publico, publicado, congelado_em",
@@ -219,6 +256,83 @@ Deno.serve(async (req) => {
         return json({ error: error?.message ?? "Falha ao criar casamento" }, 500);
       }
       return json({ casamento: publicMeta(row) });
+    }
+
+    if (action === "list_mine") {
+      const owner = await requireOwner(req);
+      if (!owner) {
+        return json({ error: "Entre na sua conta de noivos." }, 401);
+      }
+      const { data: rows, error } = await supabase
+        .from("casamentos")
+        .select(
+          "id, nome, data, descricao_romantica, slug_privado, slug_publico, publicado, congelado_em, created_at",
+        )
+        .eq("owner_id", owner.id)
+        .order("created_at", { ascending: false });
+      if (error) return json({ error: error.message }, 500);
+      return json({
+        casamentos: (rows ?? []).map((row) => publicMeta(row)),
+      });
+    }
+
+    if (action === "mine_painel") {
+      const owner = await requireOwner(req);
+      if (!owner) {
+        return json({ error: "Entre na sua conta de noivos." }, 401);
+      }
+      const { data: row, error } = await supabase
+        .from("casamentos")
+        .select(
+          "id, nome, data, descricao_romantica, slug_privado, slug_publico, publicado, congelado_em",
+        )
+        .eq("owner_id", owner.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) return json({ error: error.message }, 500);
+      if (!row) {
+        return json({
+          casamento: null,
+          fotosCount: 0,
+          bytesTotal: 0,
+        });
+      }
+
+      const { data: fotos, error: fotosErr } = await supabase
+        .from("fotos")
+        .select("id, storage_path, bytes")
+        .eq("casamento_id", row.id);
+      if (fotosErr) return json({ error: fotosErr.message }, 500);
+      const lista = fotos ?? [];
+
+      // Preenche bytes faltantes a partir do Storage (fotos antigas).
+      let bytesTotal = 0;
+      for (const foto of lista) {
+        if (typeof foto.bytes === "number" && foto.bytes >= 0) {
+          bytesTotal += foto.bytes;
+          continue;
+        }
+        const { data: meta } = await supabase.storage
+          .from(BUCKET)
+          .info(foto.storage_path);
+        const size = Number(
+          meta?.size ??
+            (meta as { metadata?: { size?: number } } | null)?.metadata?.size ??
+            0,
+        );
+        const safe = Number.isFinite(size) && size > 0 ? size : 0;
+        if (safe > 0) {
+          await supabase.from("fotos").update({ bytes: safe }).eq("id", foto.id);
+        }
+        bytesTotal += safe;
+      }
+
+      return json({
+        casamento: publicMeta(row),
+        fotosCount: lista.length,
+        bytesTotal,
+      });
     }
 
     if (action === "welcome") {
@@ -342,7 +456,11 @@ Deno.serve(async (req) => {
       if (up.error) return json({ error: up.error.message }, 500);
       const { data: foto, error: fotoErr } = await supabase
         .from("fotos")
-        .insert({ casamento_id: row.id, storage_path: path })
+        .insert({
+          casamento_id: row.id,
+          storage_path: path,
+          bytes: file.size,
+        })
         .select("id, storage_path, created_at")
         .single();
       if (fotoErr || !foto) {

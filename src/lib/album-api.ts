@@ -51,13 +51,15 @@ export async function albumAction<T extends JsonResponse>(
   action: string,
   payload: Record<string, unknown> = {},
   token?: string | null,
+  accessToken?: string | null,
 ): Promise<T> {
+  const bearer = accessToken || anonKey()
   const res = await fetch(baseUrl(), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       apikey: anonKey(),
-      Authorization: `Bearer ${anonKey()}`,
+      Authorization: `Bearer ${bearer}`,
       ...(token ? { 'x-album-token': token } : {}),
     },
     body: JSON.stringify({ action, ...payload }),
@@ -133,4 +135,50 @@ export function linkPrivado(slug: string) {
 
 export function linkPublico(slug: string) {
   return `${window.location.origin}/a/${slug}`
+}
+
+export type PainelResumo = {
+  casamento: CasamentoPublico | null
+  fotosCount: number
+  bytesTotal: number
+}
+
+export async function fetchMinePainel(
+  accessToken: string,
+): Promise<PainelResumo> {
+  return albumAction<PainelResumo & Record<string, unknown>>(
+    'mine_painel',
+    {},
+    null,
+    accessToken,
+  )
+}
+
+/** Um álbum por conta: caminho do privado ou /criar se ainda não existir. */
+export async function pathDoMeuAlbum(accessToken: string): Promise<string> {
+  const res = await albumAction<{ casamentos: CasamentoPublico[] }>(
+    'list_mine',
+    {},
+    null,
+    accessToken,
+  )
+  const primeiro = res.casamentos[0]
+  if (!primeiro) return '/criar'
+  return `/p/${primeiro.slugPrivado}`
+}
+
+export function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
+  const gb = bytes / 1024 ** 3
+  if (gb >= 1) {
+    const n = gb >= 10 ? gb.toFixed(0) : gb.toFixed(2)
+    return `${n.replace('.', ',')} GB`
+  }
+  const mb = bytes / 1024 ** 2
+  if (mb >= 1) {
+    const n = mb >= 10 ? mb.toFixed(0) : mb.toFixed(1)
+    return `${n.replace('.', ',')} MB`
+  }
+  const kb = bytes / 1024
+  return `${Math.max(1, Math.round(kb))} KB`
 }

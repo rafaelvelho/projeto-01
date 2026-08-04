@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import {
   albumAction,
   linkPrivado,
   linkPublico,
   type CasamentoPublico,
 } from '../lib/album-api'
+import { useAuth } from '../lib/auth'
 import '../prototype/criar-casamento/criar-casamento.css'
 
 const SUGSTOES = [
@@ -30,12 +32,42 @@ const empty: Draft = {
 }
 
 export function CriarCasamentoPage() {
+  const { user, session, loading: authLoading, signOut } = useAuth()
   const [draft, setDraft] = useState(empty)
   const [sugIdx, setSugIdx] = useState(2)
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
   const [casamento, setCasamento] = useState<CasamentoPublico | null>(null)
   const [copied, setCopied] = useState<'privado' | 'publico' | null>(null)
+  const [jaTemAlbum, setJaTemAlbum] = useState(false)
+  const [checando, setChecando] = useState(true)
+
+  useEffect(() => {
+    if (!session?.access_token) {
+      setChecando(false)
+      return
+    }
+    let cancelled = false
+    async function check() {
+      try {
+        const res = await albumAction<{ casamentos: CasamentoPublico[] }>(
+          'list_mine',
+          {},
+          null,
+          session!.access_token,
+        )
+        if (!cancelled && res.casamentos.length > 0) setJaTemAlbum(true)
+      } catch {
+        /* deixa criar; o servidor bloqueia se já existir */
+      } finally {
+        if (!cancelled) setChecando(false)
+      }
+    }
+    void check()
+    return () => {
+      cancelled = true
+    }
+  }, [session])
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((d) => ({ ...d, [key]: value }))
@@ -54,14 +86,39 @@ export function CriarCasamentoPage() {
     }
   }, [draft.data])
 
+  if (!authLoading && !user) {
+    return <Navigate to="/entrar?proximo=criar" replace />
+  }
+
+  if (jaTemAlbum) {
+    return <Navigate to="/painel" replace />
+  }
+
+  if (authLoading || checando) {
+    return (
+      <div className="proto-criar-root">
+        <div className="vc-page">
+          <p style={{ color: 'var(--classic-muted)' }}>Carregando…</p>
+        </div>
+      </div>
+    )
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
+    if (!session?.access_token) {
+      setErro('Entre na sua conta para criar o álbum.')
+      return
+    }
     setErro('')
     setLoading(true)
     try {
-      const res = await albumAction<{ casamento: CasamentoPublico }>('create', {
-        ...draft,
-      })
+      const res = await albumAction<{ casamento: CasamentoPublico }>(
+        'create',
+        { ...draft },
+        null,
+        session.access_token,
+      )
       setCasamento(res.casamento)
     } catch (err) {
       setErro(err instanceof Error ? err.message : 'Falha ao criar')
@@ -84,6 +141,7 @@ export function CriarCasamentoPage() {
         : linkPublico(casamento.slugPublico)
     await navigator.clipboard.writeText(url)
     setCopied(kind)
+    window.setTimeout(() => setCopied(null), 2000)
   }
 
   return (
@@ -92,6 +150,16 @@ export function CriarCasamentoPage() {
         <section className="vc-form-pane">
           <p className="vc-brand">Álbum coletivo</p>
           <h1>Montar o álbum</h1>
+          <p style={{ color: 'var(--classic-muted)', marginTop: '-0.5rem' }}>
+            {user?.email} ·{' '}
+            <button
+              type="button"
+              className="vc-linkish"
+              onClick={() => void signOut()}
+            >
+              Sair
+            </button>
+          </p>
           <form onSubmit={submit}>
             <label>
               Nome
@@ -163,7 +231,7 @@ export function CriarCasamentoPage() {
                 O link público só funciona depois que os noivos publicarem o
                 álbum.
               </p>
-              <a href={linkPrivado(casamento.slugPrivado)}>Abrir link privado</a>
+              <a href={linkPrivado(casamento.slugPrivado)}>Abrir o álbum</a>
             </div>
           )}
         </section>

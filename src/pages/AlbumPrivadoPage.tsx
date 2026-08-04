@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   albumAction,
   albumUpload,
@@ -12,6 +12,7 @@ import {
   type FotoItem,
   type Papel,
 } from '../lib/album-api'
+import { downloadAlbumZip } from '../lib/download-album'
 import '../prototype/album-privado/album-privado.css'
 
 export function AlbumPrivadoPage() {
@@ -30,9 +31,11 @@ export function AlbumPrivadoPage() {
   const [painelNoivosAberto, setPainelNoivosAberto] = useState(false)
   const [linkPublicoCopiado, setLinkPublicoCopiado] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [baixando, setBaixando] = useState(false)
 
   const unlocked = Boolean(token && casamento)
   const modoNoivos = papel === 'noivos'
+  const envioConvidadoBloqueado = Boolean(casamento?.congelado && !modoNoivos)
 
   useEffect(() => {
     let cancelled = false
@@ -151,6 +154,9 @@ export function AlbumPrivadoPage() {
 
   async function apagar(fotoId: string) {
     if (!token || !modoNoivos) return
+    if (!window.confirm('Apagar esta foto? Esta ação não pode ser desfeita.')) {
+      return
+    }
     setBusy(true)
     try {
       await albumAction('delete_foto', { fotoId }, token)
@@ -181,6 +187,13 @@ export function AlbumPrivadoPage() {
 
   async function despublicar() {
     if (!token) return
+    if (
+      !window.confirm(
+        'Despublicar o álbum? O link público deixa de funcionar até publicar de novo.',
+      )
+    ) {
+      return
+    }
     setBusy(true)
     try {
       const res = await albumAction<{ casamento: CasamentoPublico }>(
@@ -229,6 +242,19 @@ export function AlbumPrivadoPage() {
     } catch {
       setErro('Não foi possível copiar o link. Copie manualmente abaixo.')
       setLinkPublicoCopiado(true)
+    }
+  }
+
+  async function baixarAlbum() {
+    if (!casamento || fotos.length === 0) return
+    setBaixando(true)
+    setErro('')
+    try {
+      await downloadAlbumZip(casamento.nome, fotos)
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Falha ao baixar o álbum')
+    } finally {
+      setBaixando(false)
     }
   }
 
@@ -325,6 +351,13 @@ export function AlbumPrivadoPage() {
               </button>
               <button
                 type="button"
+                onClick={() => void baixarAlbum()}
+                disabled={fotos.length === 0 || baixando || busy}
+              >
+                {baixando ? 'Preparando ZIP…' : 'Baixar álbum'}
+              </button>
+              <button
+                type="button"
                 onClick={() => void gerarLinkPublico()}
                 disabled={!casamento.publicado}
                 title={
@@ -355,6 +388,33 @@ export function AlbumPrivadoPage() {
           )}
         </header>
 
+        {(casamento.congelado || casamento.publicado) && (
+          <div className="cc-status-banner" role="status">
+            {casamento.congelado && (
+              <p>
+                {modoNoivos
+                  ? 'Álbum congelado: convidados não enviam mais. Noivos ainda podem enviar e apagar.'
+                  : 'Álbum congelado: o envio pelos convidados foi encerrado após a publicação.'}
+              </p>
+            )}
+            {casamento.publicado ? (
+              <div className="cc-status-public">
+                <p>Link público ativo — quem tiver o link pode só ver as fotos.</p>
+                <Link
+                  className="cc-status-public-btn"
+                  to={`/a/${casamento.slugPublico}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Abrir álbum público
+                </Link>
+              </div>
+            ) : casamento.congelado ? (
+              <p>Link público desligado no momento.</p>
+            ) : null}
+          </div>
+        )}
+
         {erro && <p className="aa-erro" style={{ padding: '0 1rem' }}>{erro}</p>}
 
         {fotos.length === 0 ? (
@@ -376,22 +436,40 @@ export function AlbumPrivadoPage() {
           </div>
         )}
 
-        <button
-          type="button"
-          className="cc-fab"
-          onClick={() => setShowSend(true)}
-          disabled={(casamento.congelado && !modoNoivos) || busy}
-        >
-          Enviar fotos
-        </button>
+        <div className="cc-actions-bar">
+          <button
+            type="button"
+            className="cc-download-btn"
+            onClick={() => void baixarAlbum()}
+            disabled={fotos.length === 0 || baixando || busy}
+          >
+            {baixando ? 'Preparando ZIP…' : 'Baixar álbum'}
+          </button>
+          <button
+            type="button"
+            className="cc-fab"
+            onClick={() => setShowSend(true)}
+            disabled={envioConvidadoBloqueado || busy}
+            title={
+              envioConvidadoBloqueado
+                ? 'Envio de convidados congelado'
+                : 'Enviar ou tirar foto'
+            }
+          >
+            Enviar fotos
+          </button>
+        </div>
+        {envioConvidadoBloqueado && (
+          <p className="cc-fab-hint">Envio de convidados congelado.</p>
+        )}
 
-        {showSend && (
+        {showSend && !envioConvidadoBloqueado && (
           <div className="aa-modal">
             <div className="cc-sheet">
               <h2>Enviar</h2>
               <p>JPG ou PNG</p>
               <label className="aa-drop">
-                Escolher do celular
+                Escolher da galeria
                 <input
                   type="file"
                   accept="image/jpeg,image/png"

@@ -6,6 +6,7 @@ import {
   type CasamentoPublico,
   type FotoItem,
 } from '../lib/album-api'
+import { downloadAlbumZip } from '../lib/download-album'
 import '../prototype/album-privado/album-privado.css'
 
 export function AlbumPublicoPage() {
@@ -13,6 +14,8 @@ export function AlbumPublicoPage() {
   const [loading, setLoading] = useState(true)
   const [casamento, setCasamento] = useState<CasamentoPublico | null>(null)
   const [fotos, setFotos] = useState<FotoItem[]>([])
+  const [baixando, setBaixando] = useState(false)
+  const [erro, setErro] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -37,6 +40,19 @@ export function AlbumPublicoPage() {
       cancelled = true
     }
   }, [slug])
+
+  async function baixarAlbum() {
+    if (!casamento || fotos.length === 0) return
+    setBaixando(true)
+    setErro('')
+    try {
+      await downloadAlbumZip(casamento.nome, fotos)
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : 'Falha ao baixar o álbum')
+    } finally {
+      setBaixando(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -74,6 +90,8 @@ export function AlbumPublicoPage() {
           <p className="cc-bar-date">{formatDataCasamento(casamento.data)}</p>
         </header>
 
+        {erro && <p className="aa-erro" style={{ padding: '0 1rem' }}>{erro}</p>}
+
         {fotos.length === 0 ? (
           <div className="cc-empty-wrap">
             <p className="cc-empty">Nenhuma foto neste álbum ainda.</p>
@@ -87,6 +105,17 @@ export function AlbumPublicoPage() {
             ))}
           </div>
         )}
+
+        <div className="cc-actions-bar">
+          <button
+            type="button"
+            className="cc-download-btn"
+            onClick={() => void baixarAlbum()}
+            disabled={fotos.length === 0 || baixando}
+          >
+            {baixando ? 'Preparando ZIP…' : 'Baixar álbum'}
+          </button>
+        </div>
       </div>
     </div>
   )

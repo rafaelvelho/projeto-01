@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../lib/auth'
 import '../App.css'
 
 export function HomePage() {
+  const { user, loading } = useAuth()
+
   return (
     <section
       className="home-classic"
@@ -40,26 +43,68 @@ export function HomePage() {
             color: 'var(--classic-ink)',
           }}
         >
-          Memórias do casamento
+          O álbum do nosso casamento
         </h1>
-        <p style={{ margin: '0 0 1.75rem', color: 'var(--classic-muted)', lineHeight: 1.5 }}>
-          Um álbum de fotos para o seu casamento — convidados enviam, todos veem.
+        <p
+          style={{
+            margin: '0 0 1.75rem',
+            color: 'var(--classic-muted)',
+            lineHeight: 1.5,
+          }}
+        >
+          Monte o álbum, compartilhe o link com os convidados e, quando quiser,
+          publique a versão só de visualização.
         </p>
-        <p>
-          <Link
-            to="/criar"
+
+        {!loading && user ? (
+          <p>
+            <Link
+              to="/painel"
+              style={{
+                display: 'inline-block',
+                background: 'var(--classic-champagne-deep)',
+                color: 'var(--classic-white)',
+                textDecoration: 'none',
+                padding: '0.85rem 1.4rem',
+                fontWeight: 700,
+              }}
+            >
+              Ver nosso álbum
+            </Link>
+          </p>
+        ) : (
+          <p
             style={{
-              display: 'inline-block',
-              background: 'var(--classic-champagne-deep)',
-              color: 'var(--classic-white)',
-              textDecoration: 'none',
-              padding: '0.85rem 1.4rem',
-              fontWeight: 700,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.85rem',
+              alignItems: 'center',
             }}
           >
-            Criar casamento
-          </Link>
-        </p>
+            <Link
+              to="/entrar?proximo=criar"
+              style={{
+                display: 'inline-block',
+                background: 'var(--classic-champagne-deep)',
+                color: 'var(--classic-white)',
+                textDecoration: 'none',
+                padding: '0.85rem 1.4rem',
+                fontWeight: 700,
+              }}
+            >
+              Começar o álbum
+            </Link>
+            <Link
+              to="/entrar"
+              style={{
+                color: 'var(--classic-champagne-deep)',
+                fontSize: '0.95rem',
+              }}
+            >
+              Já tenho conta — entrar
+            </Link>
+          </p>
+        )}
       </div>
     </section>
   )
