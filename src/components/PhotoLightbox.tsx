@@ -79,9 +79,6 @@ export function PhotoLightbox({
 
   if (!foto) return null
 
-  const textoShare = titulo
-    ? `Olha esta foto de ${titulo}`
-    : 'Olha esta foto do álbum'
   const paginaUrl = window.location.href
 
   async function compartilharNativo() {
@@ -91,16 +88,13 @@ export function PhotoLightbox({
     setMenuAberto(false)
     try {
       const file = await albumShareFile(foto.id, albumToken)
-      const payloadFiles = { files: [file], title: titulo || 'Álbum', text: textoShare }
-      if (navigator.canShare?.(payloadFiles)) {
-        await navigator.share(payloadFiles)
-        return
+      const payloadFiles = { files: [file] }
+      if (!navigator.canShare?.(payloadFiles)) {
+        throw new Error(
+          'Este navegador não permite compartilhar só a imagem. Tente no celular.',
+        )
       }
-      await navigator.share({
-        title: titulo || 'Álbum',
-        text: textoShare,
-        url: paginaUrl,
-      })
+      await navigator.share(payloadFiles)
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') return
       setAviso(
@@ -112,8 +106,11 @@ export function PhotoLightbox({
   }
 
   function abrirWhatsApp() {
-    const url = `https://wa.me/?text=${encodeURIComponent(`${textoShare}\n${paginaUrl}`)}`
-    window.open(url, '_blank', 'noopener,noreferrer')
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(paginaUrl)}`,
+      '_blank',
+      'noopener,noreferrer',
+    )
     setMenuAberto(false)
   }
 
